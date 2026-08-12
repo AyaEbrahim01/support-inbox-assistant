@@ -1,39 +1,68 @@
 # Support Inbox Assistant
 
-A small full-stack application for first-pass triage of customer support tickets.
+An AI-powered support ticket triage assistant that classifies incoming customer support tickets, assigns priority, generates a short summary and suggested reply, and flags tickets that require escalation.
 
-For each ticket, the system generates:
+The project combines a local LLM, structured validation, a FastAPI backend, and a React frontend for human review.
 
-* Category
-* Priority
-* One-line summary
-* Suggested reply
-* Confidence score
-* Escalation flag
+---
 
-The suggested reply is only a draft. A support agent reviews and edits it before anything is sent.
+## Overview
+
+Support teams receive tickets that can vary significantly in topic, urgency, and complexity. The goal of this project is to automate the first-pass triage while keeping a human reviewer in the loop.
+
+For each ticket, the system produces:
+
+* **Category**
+
+  * `billing`
+  * `bug`
+  * `feature_request`
+  * `account`
+  * `security`
+  * `other`
+* **Priority**
+
+  * `low`
+  * `medium`
+  * `high`
+  * `urgent`
+* **Summary**
+* **Suggested reply**
+* **Confidence score**
+* **Escalation decision**
+
+The generated output is validated with Pydantic before being returned by the API.
+
+---
 
 ## Architecture
 
 ```mermaid
-flowchart TD
-    A["Customer Ticket"] --> B["React + Vite"]
-    B -->|HTTP| C["FastAPI"]
-    C --> D["Triage Pipeline"]
-    D --> E["Ollama / Llama 3.2 3B"]
-    E --> F["Pydantic Validation"]
-    F --> G["Triage Result"]
-    G --> H["Human Review"]
-
-    I["30 Tickets"] --> J["Evaluation Harness"]
-    J --> K["16 Labeled Tickets"]
-    K --> L["eval/results.json"]
+flowchart LR
+    A[Customer Tickets<br/>tickets.json] --> B[Support Inbox Assistant]
+    B --> C[Local LLM<br/>Llama 3.2 3B]
+    C --> D[Structured Triage Result]
+    D --> E[Pydantic Validation]
+    E --> F[FastAPI Backend]
+    F --> G[React Frontend]
+    G --> H[Human Review]
+    
+    A --> I[Evaluation Pipeline]
+    D --> I
+    I --> J[Metrics & Error Analysis]
 ```
+
+The system follows an end-to-end flow:
+
+**Input tickets → LLM triage → structured validation → API → React review interface → human review**
+
+---
 
 ## Project Structure
 
 ```text
 support-inbox-assistant/
+│
 ├── backend/
 │   ├── data.py
 │   ├── llm.py
@@ -42,8 +71,8 @@ support-inbox-assistant/
 │   └── schemas.py
 │
 ├── data/
-│   ├── labels.json
-│   └── tickets.json
+│   ├── tickets.json
+│   └── labels.json
 │
 ├── eval/
 │   ├── current_predictions.json
@@ -60,6 +89,7 @@ support-inbox-assistant/
 │       └── v3_final.txt
 │
 ├── frontend/
+│   ├── public/
 │   ├── src/
 │   │   ├── App.jsx
 │   │   ├── App.css
@@ -69,93 +99,279 @@ support-inbox-assistant/
 │   ├── package-lock.json
 │   └── vite.config.js
 │
-├── requirements.txt
-└── README.md
+├── .gitignore
+├── README.md
+└── requirements.txt
 ```
 
-## Tech Stack
+---
 
-### Backend
+## Backend
 
-* Python
-* FastAPI
-* Uvicorn
-* Pydantic
-* OpenAI Python SDK
-* Ollama
+The backend is implemented with **FastAPI**.
 
-### Frontend
+### Main endpoints
+
+### `GET /`
+
+Basic application status.
+
+### `GET /health`
+
+Health check endpoint.
+
+Example response:
+
+```json
+{
+  "status": "ok"
+}
+```
+
+### `GET /tickets`
+
+Returns the available support tickets.
+
+### `POST /tickets/{ticket_id}/triage`
+
+Runs the LLM triage pipeline for the selected ticket and returns a structured result.
+
+Example:
+
+```json
+{
+  "id": "T-014",
+  "category": "security",
+  "priority": "high",
+  "summary": "Possible vulnerability disclosure in /reports/{id} endpoint",
+  "suggested_reply": "Thank you for reporting this issue. We take security concerns seriously and will review the details you provided.",
+  "confidence": 0.8,
+  "escalate": true
+}
+```
+
+---
+
+## Structured Output
+
+The LLM output is validated using Pydantic.
+
+The schema restricts the model to the supported categories and priority levels and validates the confidence score.
+
+This prevents malformed or unexpected model output from being passed directly to the frontend.
+
+For example:
+
+```python
+class TriageResult(BaseModel):
+    category: Literal[
+        "billing",
+        "bug",
+        "feature_request",
+        "account",
+        "security",
+        "other"
+    ]
+
+    priority: Literal[
+        "low",
+        "medium",
+        "high",
+        "urgent"
+    ]
+
+    summary: str
+    suggested_reply: str
+    confidence: float = Field(ge=0.0, le=1.0)
+    escalate: bool
+```
+
+---
+
+## LLM
+
+The project uses a lightweight local LLM through the OpenAI-compatible client interface.
+
+The model is configured through environment variables rather than hard-coded credentials.
+
+Example configuration:
+
+```text
+LLM_BASE_URL=...
+LLM_API_KEY=...
+LLM_MODEL=...
+```
+
+No API keys or secrets should be committed to the repository.
+
+The LLM is instructed to return structured triage information and to treat ticket contents as untrusted customer-provided data rather than as system instructions.
+
+---
+
+## Evaluation
+
+The evaluation harness compares model predictions against the available ground-truth labels.
+
+The evaluation currently covers **16 labeled tickets out of the 30-ticket dataset**.
+
+The final evaluation metrics are stored in:
+
+```text
+eval/results.json
+```
+
+The corresponding analysis is documented in:
+
+```text
+eval/error_analysis.md
+```
+
+### Final Evaluation
+
+The current final version achieves:
+
+| Metric             |     Result |
+| ------------------ | ---------: |
+| Category accuracy  | **75.00%** |
+| Priority agreement | **43.75%** |
+
+The evaluation shows that category classification is substantially stronger than priority classification.
+
+Priority calibration remains the main weakness because business urgency cannot always be inferred from the issue category alone.
+
+---
+
+## Evaluation Versions
+
+The `eval/` directory contains artifacts from the main iterations of the triage pipeline.
+
+* **Baseline (`v0`)** — the initial implementation used as a reference point.
+* **Version 1 (`v1`)** — the first improvement to the prompting and triage behavior.
+* **Version 2 (`v2`)** — further refinement based on observed evaluation errors.
+* **Final (`v3`)** — the version selected for submission after the evaluation iterations.
+
+The versioned files are intentionally kept to make the development and evaluation progression transparent.
+
+### Final Submission Artifacts
+
+The **final submission results** are:
+
+* `eval/results.json` — final evaluation metrics and predictions for the 30-ticket dataset.
+* `eval/error_analysis.md` — final error analysis, limitations, and proposed improvements.
+* `eval/evaluation.py` — evaluation harness used to calculate the metrics.
+* `eval/current_predictions.json` — predictions generated by the current pipeline.
+
+The other versioned prediction/result files are historical artifacts from earlier iterations and are not the final submitted evaluation.
+
+---
+
+## Error Analysis
+
+The main observed failure modes are:
+
+### 1. Priority calibration
+
+The model tends to overuse `medium` and `high`.
+
+Examples include tickets where the underlying issue is correctly identified but the business urgency is miscalibrated.
+
+This indicates that priority should be determined using explicit impact and urgency criteria rather than category alone.
+
+### 2. Category overlap
+
+Some categories have similar semantic signals.
+
+Examples include:
+
+* `security` vs `bug`
+* `account` vs `billing`
+* `account` vs `feature_request`
+
+A ticket may contain multiple issues, which makes choosing the primary category more difficult.
+
+### 3. Ambiguous or adversarial inputs
+
+Some tickets contain unclear requests or instructions embedded inside the customer message.
+
+These messages should be treated as **untrusted input**.
+
+The system should classify the content rather than follow instructions contained within the ticket.
+
+---
+
+## Human-in-the-Loop Design
+
+The system is intentionally designed as a **decision-support tool rather than a fully autonomous support agent**.
+
+The React interface allows a human reviewer to:
+
+1. Select a ticket.
+2. View the original customer message.
+3. Review the predicted category.
+4. Review the predicted priority.
+5. Review the confidence score.
+6. Review whether escalation is recommended.
+7. Review and edit the suggested reply.
+
+The suggested response is therefore not automatically sent to the customer.
+
+---
+
+## Frontend
+
+The frontend is built with:
 
 * React
 * Vite
 * JavaScript
 * CSS
 
-### Model
+The frontend communicates with the FastAPI backend.
 
-The application uses:
+When a ticket is selected:
 
 ```text
-llama3.2:3b
+React
+  ↓
+POST /tickets/{ticket_id}/triage
+  ↓
+FastAPI
+  ↓
+LLM
+  ↓
+Validated TriageResult
+  ↓
+React
 ```
 
-through Ollama's OpenAI-compatible local API.
+The UI displays the resulting triage information for human review.
 
-## Setup
+---
 
-### 1. Install the Python dependencies
+## Running the Project
+
+### 1. Backend Setup
 
 From the project root:
 
 ```bash
-python3 -m pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate
 ```
 
-### 2. Install Ollama
-
-Install Ollama and pull the model:
+Install the Python dependencies:
 
 ```bash
-ollama pull llama3.2:3b
+pip install -r requirements.txt
 ```
 
-Make sure Ollama is running before using the triage endpoint.
-
-### 3. Configure the LLM
-
-The LLM connection is configurable through environment variables:
-
-```text
-LLM_BASE_URL
-LLM_MODEL
-LLM_API_KEY
-```
-
-For the local setup, the default endpoint is:
-
-```text
-http://localhost:11434/v1
-```
-
-and the model is:
-
-```text
-llama3.2:3b
-```
-
-The local Ollama setup does not require an API key.
-
-No API keys or secrets should be committed to the repository.
-
-## Running the Backend
-
-From the project root:
+Start the FastAPI server:
 
 ```bash
 python3 -m uvicorn backend.main:app --reload
 ```
 
-The backend runs on:
+The API will be available at:
 
 ```text
 http://127.0.0.1:8000
@@ -167,59 +383,9 @@ FastAPI's interactive documentation is available at:
 http://127.0.0.1:8000/docs
 ```
 
-### API endpoints
+---
 
-#### Health check
-
-```http
-GET /health
-```
-
-Example response:
-
-```json
-{
-  "status": "ok"
-}
-```
-
-#### Get tickets
-
-```http
-GET /tickets
-```
-
-Returns the tickets from `data/tickets.json`.
-
-#### Triage a ticket
-
-```http
-POST /tickets/{ticket_id}/triage
-```
-
-For example:
-
-```text
-POST /tickets/T-001/triage
-```
-
-The endpoint loads the ticket, sends it through the triage pipeline, validates the model output, and returns the structured result.
-
-Example:
-
-```json
-{
-  "id": "T-001",
-  "category": "billing",
-  "priority": "medium",
-  "summary": "Duplicate charge for June subscription",
-  "suggested_reply": "I apologize for the inconvenience. Can you please confirm your subscription details so we can investigate this further?",
-  "confidence": 0.8,
-  "escalate": false
-}
-```
-
-## Running the Frontend
+### 2. Frontend Setup
 
 Open another terminal:
 
@@ -229,234 +395,151 @@ npm install
 npm run dev
 ```
 
-Vite will print the local development URL in the terminal.
+Vite will display the local frontend URL in the terminal.
 
-The frontend loads the tickets from the FastAPI backend. Selecting a ticket sends a request to the triage endpoint and displays the result.
+Open that URL in the browser.
 
-The suggested reply is shown in an editable text area so the support agent can modify it before using it.
+---
 
-## Evaluation
-
-The evaluation is run separately from the frontend.
-
-### Generate predictions
+## Running the Evaluation
 
 From the project root:
-
-```bash
-python3 -m backend.pipeline
-```
-
-This runs the pipeline over all 30 tickets and writes:
-
-```text
-eval/current_predictions.json
-```
-
-### Run evaluation
 
 ```bash
 python3 -m eval.evaluation
 ```
 
-The evaluation compares the predictions against the labeled subset and writes the final result to:
+The evaluation script compares the predictions against the available labels and writes the results to:
 
 ```text
 eval/results.json
 ```
 
-## Evaluation Results
+The prediction pipeline can be run with:
 
-There are 30 tickets in the input dataset, with ground-truth labels available for 16 of them.
-
-The final evaluation produced:
-
-| Metric             | Result |
-| ------------------ | -----: |
-| Category accuracy  | 75.00% |
-| Priority agreement | 43.75% |
-
-The system produced predictions for all 30 tickets. The reported metrics are calculated only from the 16 tickets that have labels.
-
-The complete output is in:
-
-```text
-eval/results.json
+```bash
+python3 -m backend.pipeline
 ```
 
-This file contains:
-
-* the two evaluation metrics
-* all 30 predictions
-* category and priority predictions
-* summaries
-* suggested replies
-* confidence scores
-* escalation decisions
-
-## Error Analysis
-
-The main issue in the current version is priority classification.
-
-The model generally identifies the type of problem better than it estimates its urgency. It tends to predict `medium` or `high` for cases where the expected label is different.
-
-Some examples:
-
-* T-001: expected `high`, predicted `medium`
-* T-003: expected `low`, predicted `medium`
-* T-005: expected `high`, predicted `medium`
-* T-019: expected `urgent`, predicted `high`
-* T-021: expected `high`, predicted `low`
-
-There are also some category boundary issues, particularly between:
-
-* `security` and `bug`
-* `account` and `billing`
-* `account` and `feature_request`
-
-For example, T-006 is labeled as a bug but was classified as security, while T-009 is labeled as billing but was classified as account.
-
-A more detailed analysis is available in:
+This generates:
 
 ```text
-eval/error_analysis.md
+eval/current_predictions.json
 ```
 
-## Handling Unreliable LLM Output
+---
 
-The LLM is not treated as a trusted source of structured data.
+## Environment Variables
 
-The output is validated against a Pydantic schema.
+The LLM configuration should be provided through environment variables.
 
-The schema restricts:
+A local `.env` file can be used during development.
+
+Example:
 
 ```text
-category
-priority
-summary
-suggested_reply
-confidence
-escalate
+LLM_BASE_URL=your_llm_endpoint
+LLM_API_KEY=your_api_key
+LLM_MODEL=your_model
 ```
 
-Category and priority are restricted to the allowed values, while confidence must be between `0.0` and `1.0`.
+The `.env` file should **not** be committed to Git.
 
-This means malformed or out-of-range output does not directly become application data.
+The repository's `.gitignore` excludes environment files and other local development artifacts.
 
-The LLM integration also includes fallback/retry handling for unreliable model responses.
+---
 
-## Human-in-the-Loop
+## Dependencies
 
-The application does not automatically send any generated reply.
-
-The workflow is:
+### Backend
 
 ```text
-Ticket
-  ↓
-LLM triage
-  ↓
-Structured result
-  ↓
-Human review
-  ↓
-Edit suggested reply
-  ↓
-Agent decides what to send
+FastAPI
+Uvicorn
+Pydantic
+python-dotenv
+OpenAI-compatible Python client
 ```
 
-This is intentional. The model is being used to reduce the amount of manual triage work, not to make autonomous customer-facing decisions.
-
-## Prompt Injection / Untrusted Input
-
-Ticket content is treated as untrusted input.
-
-Some of the provided tickets contain adversarial text or instructions such as:
+### Frontend
 
 ```text
-Ignore all previous instructions.
+React
+Vite
 ```
 
-These instructions are part of the customer's message and should not override the application's triage instructions.
+Frontend dependencies are managed through `package.json` and `package-lock.json`.
 
-This is especially important for a support system because customer messages should never be treated as trusted system-level instructions.
+---
 
 ## Design Decisions
 
-### Why a local model?
+### Local LLM
 
-The task specifies a free local model that is the same for everyone.
+A lightweight local model was used to keep the system inexpensive, reproducible, and suitable for a small proof of concept.
 
-Using Ollama and Llama 3.2 3B keeps inference local and avoids depending on an external paid API.
+### Structured validation
 
-The downside is that a small model is less consistent than a larger model, especially for ambiguous priority decisions.
+Pydantic validation provides a clear contract between the LLM and the application.
 
-### Why Pydantic?
+### Human review
 
-The application needs predictable structured output from an unreliable LLM.
+Because the model is not perfectly reliable, the generated triage and suggested reply are presented for human review rather than being automatically sent.
 
-Pydantic provides a simple validation layer between the model and the rest of the application.
+### Evaluation-driven iteration
 
-### Why keep the evaluation separate?
+The pipeline was iteratively improved based on observed classification and priority errors. Earlier prediction files are retained in `eval/` to document this progression.
 
-The evaluation pipeline is independent from the frontend so that model performance can be measured directly over the dataset.
-
-This also makes it easier to compare different prompt/model versions without changing the UI.
-
-### Why not add more rules?
-
-A rule-based layer could improve some obvious cases, such as production outages or confirmed security incidents.
-
-However, adding too many rules based only on the 16 labeled examples could overfit the evaluation set.
-
-For this version, I kept the system primarily LLM-based and documented the rule-based approach as a possible next step.
+---
 
 ## Limitations
 
-This is a time-boxed prototype rather than a production support platform.
-
-Current limitations include:
+The current implementation has several limitations:
 
 * Only 16 of the 30 tickets have ground-truth labels.
-* The local 3B model has limited reasoning capability.
-* There is no persistent database for tickets or review decisions.
-* There is no authentication.
-* There is no production deployment configuration.
-* The frontend is intentionally minimal.
-* Suggested replies are not grounded in a company knowledge base.
-* Automated test coverage is limited.
+* Priority classification is less reliable than category classification.
+* The local model is relatively small and may produce inconsistent classifications.
+* Some tickets contain multiple issues, making category selection ambiguous.
+* The suggested reply is generated by the LLM and should be reviewed before sending.
+* The system is a proof of concept rather than a production-ready support automation platform.
 
-These were conscious scope decisions to keep the project focused on the core end-to-end workflow.
+---
 
-## Next Steps
+## Future Improvements
 
-If this were taken further, I would focus on:
+Potential next steps include:
 
-1. Adding labels for the remaining tickets.
-2. Improving priority definitions and calibration.
-3. Adding clearer category decision rules.
-4. Adding dedicated prompt-injection test cases.
-5. Adding automated tests for malformed LLM responses.
-6. Adding a small deterministic post-processing layer for very clear high-risk cases.
-7. Adding persistent human review/approval state.
-8. Connecting the suggested replies to a real support knowledge base.
+1. Labeling the remaining tickets to create a complete evaluation set.
+2. Improving priority definitions using explicit business-impact criteria.
+3. Adding stronger category decision rules for overlapping categories.
+4. Adding confidence-based routing to the human review queue.
+5. Adding automated tests for API endpoints and schema validation.
+6. Evaluating larger or more capable models.
+7. Adding persistent storage for reviewed tickets and corrections.
+8. Tracking reviewer feedback to improve future triage decisions.
+9. Adding more robust prompt-injection protection.
+10. Measuring performance on a held-out evaluation set to reduce overfitting to the current labels.
 
-## Final Notes
+---
 
-The current implementation covers the requested end-to-end flow:
+## Summary
+
+This project demonstrates an end-to-end AI support triage workflow:
 
 ```text
-Input tickets
-    ↓
+Customer ticket
+      ↓
 Local LLM
-    ↓
-Validated triage
-    ↓
+      ↓
+Structured triage
+      ↓
+Pydantic validation
+      ↓
 FastAPI
-    ↓
+      ↓
 React review interface
-    ↓
-Human review
+      ↓
+Human decision
 ```
 
-The evaluation result should be interpreted honestly: category classification is reasonably stronger than priority classification, and the current system is best used as a first-pass assistant with human review rather than an autonomous support system.
+The implementation focuses on practical AI engineering concerns including structured LLM outputs, API integration, evaluation, error analysis, prompt-injection awareness, and human-in-the-loop review.
