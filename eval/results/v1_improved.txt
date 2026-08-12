@@ -1,0 +1,6 @@
+Version: V1 Improved
+
+Evaluated tickets: 16
+Category accuracy: 68.75%
+Priority accuracy: 43.75%
+Overall accuracy: 31.25%

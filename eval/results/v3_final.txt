@@ -1,0 +1,168 @@
+{
+  "total_tickets": 16,
+  "category_accuracy": 0.75,
+  "priority_accuracy": 0.4375,
+  "overall_accuracy": 0.375,
+  "mismatches": [
+    {
+      "ticket_id": "T-001",
+      "expected": {
+        "category": "billing",
+        "priority": "high"
+      },
+      "predicted": {
+        "id": "T-001",
+        "category": "billing",
+        "priority": "medium",
+        "summary": "Duplicate charge for June subscription",
+        "suggested_reply": "We apologize for the mistake. We will process a refund for the duplicate charge. Please allow 3-5 business days for the refund to be processed.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-003",
+      "expected": {
+        "category": "feature_request",
+        "priority": "low"
+      },
+      "predicted": {
+        "id": "T-003",
+        "category": "feature_request",
+        "priority": "medium",
+        "summary": "Request for Dark Mode in Dashboard",
+        "suggested_reply": "Thank you for your feedback! We'll consider adding a dark mode feature to the dashboard. Please stay tuned for updates.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-005",
+      "expected": {
+        "category": "account",
+        "priority": "high"
+      },
+      "predicted": {
+        "id": "T-005",
+        "category": "account",
+        "priority": "medium",
+        "summary": "Locked out of account with missing password reset email",
+        "suggested_reply": "I apologize for the inconvenience. Can you please try resetting your password using our password recovery tool? If you continue to experience issues, I'll be happy to assist further.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-006",
+      "expected": {
+        "category": "bug",
+        "priority": "urgent"
+      },
+      "predicted": {
+        "id": "T-006",
+        "category": "security",
+        "priority": "urgent",
+        "summary": "Production API down, causing team blockage and SLA breach",
+        "suggested_reply": "Our production API is currently experiencing a 503 error, blocking your entire operations team. We are escalating this immediately to investigate and resolve the issue as soon as possible.",
+        "confidence": 0.9,
+        "escalate": true
+      }
+    },
+    {
+      "ticket_id": "T-007",
+      "expected": {
+        "category": "other",
+        "priority": "medium"
+      },
+      "predicted": {
+        "id": "T-007",
+        "category": "other",
+        "priority": "low",
+        "summary": "GDPR compliance question about data policy",
+        "suggested_reply": "Thank you for reaching out to us. Our data policy is designed to ensure the highest level of privacy and security for our customers. We do not train models on customer data, and all data is stored in accordance with GDPR regulations.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-009",
+      "expected": {
+        "category": "billing",
+        "priority": "low"
+      },
+      "predicted": {
+        "id": "T-009",
+        "category": "account",
+        "priority": "medium",
+        "summary": "Invoice needed for May payment with VAT number",
+        "suggested_reply": "We will send a proper invoice for your May payment with your company VAT number on it. Please allow 3-5 business days for processing.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-013",
+      "expected": {
+        "category": "account",
+        "priority": "low"
+      },
+      "predicted": {
+        "id": "T-013",
+        "category": "account",
+        "priority": "medium",
+        "summary": "Invite colleague to workspace",
+        "suggested_reply": "To invite a colleague to your workspace, please check the 'Workspace' tab in your account settings. You can find instructions on how to do this by clicking on the 'Help' icon next to the workspace name.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-017",
+      "expected": {
+        "category": "billing",
+        "priority": "medium"
+      },
+      "predicted": {
+        "id": "T-017",
+        "category": "billing",
+        "priority": "low",
+        "summary": "Cancel subscription request",
+        "suggested_reply": "Thank you for reaching out to us. We will process your cancellation request and confirm that you won't be billed again.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    },
+    {
+      "ticket_id": "T-019",
+      "expected": {
+        "category": "bug",
+        "priority": "urgent"
+      },
+      "predicted": {
+        "id": "T-019",
+        "category": "security",
+        "priority": "high",
+        "summary": "Webhook signature mismatch causing integration failure",
+        "suggested_reply": "We apologize for the inconvenience. Can you please confirm if the signing secret was rotated recently?",
+        "confidence": 0.8,
+        "escalate": true
+      }
+    },
+    {
+      "ticket_id": "T-021",
+      "expected": {
+        "category": "account",
+        "priority": "high"
+      },
+      "predicted": {
+        "id": "T-021",
+        "category": "security",
+        "priority": "low",
+        "summary": "Data deletion request under GDPR",
+        "suggested_reply": "Thank you for reaching out to us regarding your data deletion request under GDPR. We will review this request and confirm in writing once the action is completed.",
+        "confidence": 0.8,
+        "escalate": false
+      }
+    }
+  ]
+}

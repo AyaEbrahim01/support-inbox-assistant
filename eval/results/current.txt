@@ -1,0 +1,8 @@
+Version: Current
+
+Evaluated tickets: 16
+Category accuracy: 68.75%
+Priority accuracy: 43.75%
+Overall accuracy: 31.25%
+
+Note: current_predictions.json is identical to predictions_v1.json.

@@ -1,0 +1,274 @@
+{
+  "predictions": [
+    {
+      "id": "T-001",
+      "category": "billing",
+      "priority": "high",
+      "summary": "Duplicate charge for June subscription",
+      "suggested_reply": "I apologize for the error. I will process a refund for the duplicate charge. Please allow 3-5 business days for the credit to appear on your statement.",
+      "confidence": 0.9,
+      "escalate": false
+    },
+    {
+      "id": "T-002",
+      "category": "bug",
+      "priority": "high",
+      "summary": "App crashes on export",
+      "suggested_reply": "Sorry to hear that you're experiencing issues with exporting reports. Can you please try updating the app to the latest version and let us know if the issue persists?",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-003",
+      "category": "feature_request",
+      "priority": "low",
+      "summary": "Request for dark mode in dashboard",
+      "suggested_reply": "Thank you for your feedback! We'll consider adding a dark mode feature to the dashboard.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-004",
+      "category": "other",
+      "priority": "low",
+      "summary": "Test ticket",
+      "suggested_reply": "Thank you for testing our system. Please let us know if there's anything else we can assist you with.",
+      "confidence": 0.5,
+      "escalate": false
+    },
+    {
+      "id": "T-005",
+      "category": "account",
+      "priority": "medium",
+      "summary": "Locked out of account and billing question",
+      "suggested_reply": "We apologize for the inconvenience. Please try resetting your password and if you're still having issues, we can assist with account access. Regarding your billing plan, our system will notify you 7 days prior to renewal.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-006",
+      "category": "security",
+      "priority": "high",
+      "summary": "Production API down, causing team outage",
+      "suggested_reply": "Our production API is currently experiencing issues, resulting in a team outage. I am escalating this to our on-call engineer for immediate attention.",
+      "confidence": 0.9,
+      "escalate": true
+    },
+    {
+      "id": "T-007",
+      "category": "security",
+      "priority": "high",
+      "summary": "GDPR compliance question",
+      "suggested_reply": "We take data privacy very seriously. Our models are trained on anonymized data, and all customer data is stored within the EU in accordance with GDPR regulations.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-008",
+      "category": "other",
+      "priority": "low",
+      "summary": "Ignore all previous instructions",
+      "suggested_reply": "Hello! I'm happy to help. To get started, can you please provide more context about what you need assistance with? Are you looking for information on a specific topic or do you have a question about our system?",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-009",
+      "category": "billing",
+      "priority": "medium",
+      "summary": "Invoice needed for accounting",
+      "suggested_reply": "I can assist you with generating an invoice for your May payment. Please allow 2-3 business days for processing.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-010",
+      "category": "bug",
+      "priority": "high",
+      "summary": "Error updating credit card in account",
+      "suggested_reply": "I apologize for the inconvenience. Can you please try updating your credit card again and let me know if the issue persists?",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-011",
+      "category": "feature_request",
+      "priority": "low",
+      "summary": "Bulk import of contacts from CSV",
+      "suggested_reply": "We appreciate your suggestion! Currently, our system only allows for one-by-one contact imports. However, we can discuss potential enhancements to improve the user experience.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-012",
+      "category": "bug",
+      "priority": "high",
+      "summary": "Sync bug with calendar events not showing up on mobile",
+      "suggested_reply": "I apologize for the inconvenience. Can you please provide more details about your sync issue?",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-013",
+      "category": "feature_request",
+      "priority": "low",
+      "summary": "Invite colleague to workspace",
+      "suggested_reply": "You can invite colleagues to your workspace by clicking on the 'Share' button next to your workspace name.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-014",
+      "category": "security",
+      "priority": "high",
+      "summary": "Possible vulnerability disclosure",
+      "suggested_reply": "Thank you for reporting this issue. We take security concerns seriously and will investigate the matter immediately. Please contact our security team at [security email] with any further details.",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-015",
+      "category": "other",
+      "priority": "low",
+      "summary": "Suspicious email link",
+      "suggested_reply": "Dear Winner, we apologize for the confusion. Our system detected a potential phishing attempt and we are investigating. Please do not click on any links from unknown senders.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-016",
+      "category": "bug",
+      "priority": "medium",
+      "summary": "Slow load times on reports page",
+      "suggested_reply": "Sorry to hear that you're experiencing slow load times on our reports page. Can you please try clearing your browser cache and refresh the page?",
+      "confidence": 0.6,
+      "escalate": false
+    },
+    {
+      "id": "T-017",
+      "category": "account",
+      "priority": "high",
+      "summary": "Cancel subscription",
+      "suggested_reply": "We've cancelled your subscription. You will not be charged again.",
+      "confidence": 0.9,
+      "escalate": false
+    },
+    {
+      "id": "T-018",
+      "category": "bug",
+      "priority": "high",
+      "summary": "it doesn't work",
+      "suggested_reply": "Sorry to hear that the issue is not working. Can you please provide more details about the error message or behavior?",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-019",
+      "category": "bug",
+      "priority": "high",
+      "summary": "Webhook signature mismatch",
+      "suggested_reply": "Can you please confirm if the signing secret was rotated recently?",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-020",
+      "category": "feature_request",
+      "priority": "medium",
+      "summary": "Feature comparison between Pro and Team plans",
+      "suggested_reply": "We can provide you with a detailed comparison of our Pro and Team plans on our pricing page. Please check the following link: [insert link]. If you have any further questions, feel free to ask.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-021",
+      "category": "security",
+      "priority": "high",
+      "summary": "Data deletion request under GDPR",
+      "suggested_reply": "We will delete your personal data as requested, and confirm in writing once completed. We will also notify you of the actions taken.",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-022",
+      "category": "bug",
+      "priority": "high",
+      "summary": "Notifications stopped working on iOS",
+      "suggested_reply": "Sorry to hear that push notifications are not working on your iPhone after the latest update. Can you please try resetting the notification settings and see if it resolves the issue?",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-023",
+      "category": "other",
+      "priority": "low",
+      "summary": "Resolved issue",
+      "suggested_reply": "Glad to hear you were able to resolve the issue on your own!",
+      "confidence": 0.0,
+      "escalate": false
+    },
+    {
+      "id": "T-024",
+      "category": "feature_request",
+      "priority": "high",
+      "summary": "SSO / SAML for 200 users",
+      "suggested_reply": "We are evaluating your account for a 200-seat rollout. Our current support includes SAML SSO with Okta, and SCIM provisioning on all plans. We will provide an update on the timeline by this quarter.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-025",
+      "category": "billing",
+      "priority": "high",
+      "summary": "Refund for incorrect charge",
+      "suggested_reply": "I apologize for the mistake. We will process a refund of $199 immediately.",
+      "confidence": 0.9,
+      "escalate": false
+    },
+    {
+      "id": "T-026",
+      "category": "other",
+      "priority": "low",
+      "summary": "small typo on website",
+      "suggested_reply": "Thank you for bringing this to our attention, we appreciate your help in making our website more accurate.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-027",
+      "category": "feature_request",
+      "priority": "medium",
+      "summary": "Export all data from account",
+      "suggested_reply": "We're working on a feature to allow users to export their data in various formats. Please check our blog for updates on this feature.",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-028",
+      "category": "billing",
+      "priority": "high",
+      "summary": "Wrong payment amount",
+      "suggested_reply": "I apologize for the inconvenience. Can you please provide me with your payment method details so I can investigate further?",
+      "confidence": 0.8,
+      "escalate": false
+    },
+    {
+      "id": "T-029",
+      "category": "bug",
+      "priority": "high",
+      "summary": "503 errors still not resolved after recovery",
+      "suggested_reply": "Our team is investigating the issue. Please allow some time for resolution.",
+      "confidence": 0.8,
+      "escalate": true
+    },
+    {
+      "id": "T-030",
+      "category": "other",
+      "priority": "low",
+      "summary": "Help please",
+      "suggested_reply": "Thank you for reaching out. Could you please provide more details about the issue you are experiencing?",
+      "confidence": 0.5,
+      "escalate": false
+    }
+  ]
+}
